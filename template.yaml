@@ -1,0 +1,24 @@
+- sensor:
+    - name: Energi i år
+      unit_of_measurement: "kWh"
+      state: "{{ ((states('sensor.techem_yearly') | from_json)[0]['value']) | round(0) }}"
+
+    - name: Energi sammenlignet med i fjor
+      unit_of_measurement: "%"
+      state: "{{ (states('sensor.techem_yearly') | from_json)[0]['comparePercent'] }}"
+
+    - name: Varmtvann i år
+      unit_of_measurement: "L"
+      state: "{{ (((states('sensor.techem_yearly') | from_json)[1]['value'])*1000) | round(0) }}"
+
+    - name: Varmtvann sammenlignet med i fjor
+      unit_of_measurement: "%"
+      state: "{{ (states('sensor.techem_yearly') | from_json)[1]['comparePercent'] }}"
+
+    - name: Energi daglig snitt siste syv dager
+      unit_of_measurement: "kWh"
+      state: "{{ (((states('sensor.techem_weekly') | from_json)[0]['value'])/7) | round(0) }}"
+
+    - name: Varmtvann daglig snitt siste syv dager
+      unit_of_measurement: "L"
+      state: "{{ (((states('sensor.techem_weekly') | from_json)[1]['value'])*1000/7) | round(0) }}"
