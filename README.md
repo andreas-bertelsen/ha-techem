@@ -46,6 +46,7 @@ Koden er oversatt og utviklet med utgangspunkt i [@khaffner](https://github.com/
 ## Konfigurasjon
 ### Home Assistant kort
 Eksempel på oppsett av et kort fra bildet over:
+![techem1](https://github.com/user-attachments/assets/13dbe176-f038-4039-8456-9564575fbbf8)
 
 ### Python
 Python koden kan konfigureres til å hente data fra ulike perioder. Per nå ligger det to funksjoner inne for å konstruere korrekt datoformat:
