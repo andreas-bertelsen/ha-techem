@@ -47,7 +47,7 @@ def get_data(tenantID: int, yearly: bool) -> str:
         starttime = get_time_as_string(9)
         endtime = get_time_as_string(2)
 
-    body = "{\"query\":\"\\n      query DashboardData($tenancyId: Int!, $periodBegin: String, $periodEnd: String, $compareWith: String!) {\\n        dashboard(tenancyId: $tenancyId, periodBegin: $periodBegin, periodEnd: $periodEnd, compareWith: $compareWith) {\\n          consumptions {\\n            value\\n            comparisonValue\\n            kind\\n            comparePercent\\n          }\\n          climateAverages {\\n            value\\n            valueCompare\\n            kind\\n          }\\n        }\\n      }\\n    \",\"variables\":{\"tenancyId\":" + str(TECHEMTENANTID) + ",\"periodBegin\":\"" + starttime + "\",\"periodEnd\":\"" + endtime + "\",\"compareWith\":\"last_period\"},\"operationName\":\"DashboardData\"}"
+    body = "{\"query\":\"\\n      query DashboardData($tenancyId: Int!, $periodBegin: String, $periodEnd: String, $compareWith: String!) {\\n        dashboard(tenancyId: $tenancyId, periodBegin: $periodBegin, periodEnd: $periodEnd, compareWith: $compareWith) {\\n          consumptions {\\n            value\\n            comparisonValue\\n            kind\\n            comparePercent\\n          }\\n          climateAverages {\\n            value\\n            valueCompare\\n            kind\\n          }\\n        }\\n      }\\n    \",\"variables\":{\"tenancyId\":" + str(tenantID) + ",\"periodBegin\":\"" + starttime + "\",\"periodEnd\":\"" + endtime + "\",\"compareWith\":\"last_period\"},\"operationName\":\"DashboardData\"}"
 
     headers = {
         "Accept": "*/*",
