@@ -16,14 +16,31 @@ def get_time_as_string_year() -> tuple[str, str]:
     yesterday = today - datetime.timedelta(1)
     stop = f"{yesterday.year}-{yesterday.month:02d}-{yesterday.day:02d}"
 
-    firstDay = datetime.datetime(today.year, 1, 1)
-    start = f"{firstDay.year}-{firstDay.month:02d}-{firstDay.day:02d}"
+    first_day = datetime.datetime(today.year, 1, 1)
+    start = f"{first_day.year}-{first_day.month:02d}-{first_day.day:02d}"
 
     return start, stop
 
 # Request token
-def get_token(techemEmail: str, techemPassword: str):
-    token_body = "{\"query\":\"mutation tokenAuth($email: String!, $password: String!) { tokenAuth(email: $email, password: $password) { payload refreshExpiresIn token refreshToken } }\",\"variables\":{\"email\":\"" + techemEmail + "\",\"password\":\"" + techemPassword + "\"}}"
+def get_token(techem_email: str, techem_password: str) -> str:
+    url = "https://techemadmin.no/graphql"
+
+    token_body = {
+        "query": """
+            mutation tokenAuth($email: String!, $password: String!) {
+                tokenAuth(email: $email, password: $password) {
+                    payload
+                    refreshExpiresIn
+                    token
+                    refreshToken
+                }
+            }
+        """,
+        "variables": {
+            "email": techem_email,
+            "password": techem_password
+        }
+    }
     
     token_headers = {
         "Accept": "*/*",
@@ -32,22 +49,64 @@ def get_token(techemEmail: str, techemPassword: str):
         "Content-Type": "application/json"
     }
 
-    return requests.post("https://techemadmin.no/graphql", headers=token_headers, data=token_body, timeout=10.0).json()["data"]["tokenAuth"]["token"]
+    try:
+        response = requests.post(
+            url,
+            headers=token_headers,
+            json=token_body,
+            timeout=10.0
+        )
+        response.raise_for_status()
 
-def get_data(tenantID: int, yearly: bool) -> str:
-    token = get_token(sys.argv[1], sys.argv[2])
+        return response.json()["data"]["tokenAuth"]["token"]
+    
+    except requests.exceptions.RequestException:
+        return ""
+    except KeyError:
+        return ""
 
-    starttime, endtime = "", ""
+def get_data(techem_email: str, techem_password: str, tenant_id: int, yearly: bool) -> str:
+    token = get_token(techem_email, techem_password)
+
+    if not token:
+        return ""
 
     if yearly:
         # Get data from first day of year to yesterday
-        starttime, endtime = get_time_as_string_year()
+        start_time, end_time = get_time_as_string_year()
     else:
         # Get data from previous seven days, with 2 days offset to ensure data is available
-        starttime = get_time_as_string(9)
-        endtime = get_time_as_string(2)
+        start_time = get_time_as_string(9)
+        end_time = get_time_as_string(2)
 
-    body = "{\"query\":\"\\n      query DashboardData($tenancyId: Int!, $periodBegin: String, $periodEnd: String, $compareWith: String!) {\\n        dashboard(tenancyId: $tenancyId, periodBegin: $periodBegin, periodEnd: $periodEnd, compareWith: $compareWith) {\\n          consumptions {\\n            value\\n            comparisonValue\\n            kind\\n            comparePercent\\n          }\\n          climateAverages {\\n            value\\n            valueCompare\\n            kind\\n          }\\n        }\\n      }\\n    \",\"variables\":{\"tenancyId\":" + str(tenantID) + ",\"periodBegin\":\"" + starttime + "\",\"periodEnd\":\"" + endtime + "\",\"compareWith\":\"last_period\"},\"operationName\":\"DashboardData\"}"
+    url = "https://techemadmin.no/graphql"
+
+    body = {
+        "query": """
+            query DashboardData($tenancyId: Int!, $periodBegin: String, $periodEnd: String, $compareWith: String!) {
+                dashboard(tenancyId: $tenancyId, periodBegin: $periodBegin, periodEnd: $periodEnd, compareWith: $compareWith) {
+                    consumptions {
+                        value
+                        comparisonValue
+                        kind
+                        comparePercent
+                    }
+                    climateAverages {
+                        value
+                        valueCompare
+                        kind
+                    }
+                }
+            }
+        """,
+        "variables": {
+            "tenancyId": tenant_id,
+            "periodBegin": start_time,
+            "periodEnd": end_time,
+            "compareWith": "last_period"
+        },
+        "operationName": "DashboardData"
+    }
 
     headers = {
         "Accept": "*/*",
@@ -59,8 +118,33 @@ def get_data(tenantID: int, yearly: bool) -> str:
         "Connection" : "keep-alive"
     }
 
-    response = requests.post("https://techemadmin.no/graphql", headers=headers, data=body, timeout=10.0).json()["data"]["dashboard"]["consumptions"]
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=body,
+            timeout=10.0
+        )
+        response.raise_for_status()
 
-    return json.dumps(response)
+        data = response.json()["data"]["dashboard"]["consumptions"]
+        return json.dumps(data)
+    
+    except requests.exceptions.RequestException:
+        return ""
+    except KeyError:
+        return ""
 
-print(get_data(int(sys.argv[3]), sys.argv[4] == "True"))
+def main() -> None:
+    email = sys.argv[1]
+    password = sys.argv[2]
+    id = int(sys.argv[3])
+    yearly = sys.argv[4] == "True"
+
+    result = get_data(email, password, id, yearly)
+
+    if result:
+        print(result)
+
+if __name__ == "__main__":
+    main()
