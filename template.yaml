@@ -1,24 +1,52 @@
 - sensor:
     - name: Energi i år
       unit_of_measurement: "kWh"
-      state: "{{ ((states('sensor.techem_yearly') | from_json)[0]['value']) | round(0) }}"
+      state: "{{ ((states('sensor.techem_yearly') | from_json)['values'][0]) | round(0) }}"
 
     - name: Energi sammenlignet med i fjor
       unit_of_measurement: "%"
-      state: "{{ (states('sensor.techem_yearly') | from_json)[0]['comparePercent'] }}"
+      state: >
+        {% set current = ((states('sensor.techem_yearly') | from_json)['values'][0]) %}
+        {% set last = ((states('sensor.techem_yearly') | from_json)['comparisonValues'][0]) %}
+        {% set diff = current - last %}
+        {% set percent = (diff / last) * 100 %}
+        {{ percent | round(0) }}
 
     - name: Varmtvann i år
       unit_of_measurement: "L"
-      state: "{{ (((states('sensor.techem_yearly') | from_json)[1]['value'])*1000) | round(0) }}"
+      state: "{{ (((states('sensor.techem_yearly') | from_json)['values'][1])*1000) | round(0) }}"
 
     - name: Varmtvann sammenlignet med i fjor
       unit_of_measurement: "%"
-      state: "{{ (states('sensor.techem_yearly') | from_json)[1]['comparePercent'] }}"
+      state: >
+        {% set current = (((states('sensor.techem_yearly') | from_json)['values'][1])*1000) %}
+        {% set last = (((states('sensor.techem_yearly') | from_json)['comparisonValues'][1])*1000) %}
+        {% set diff = current - last %}
+        {% set percent = (diff / last) * 100 %}
+        {{ percent | round(0) }}
 
     - name: Energi daglig snitt siste syv dager
       unit_of_measurement: "kWh"
-      state: "{{ (((states('sensor.techem_weekly') | from_json)[0]['value'])/7) | round(0) }}"
+      state: "{{ (((states('sensor.techem_weekly') | from_json)['values'][0])/7) | round(0) }}"
+
+    - name: Energi sammenlignet med forrige syv dagers periode
+      unit_of_measurement: "%"
+      state: >
+        {% set current = (((states('sensor.techem_weekly') | from_json)['values'][0])/7) %}
+        {% set last = (((states('sensor.techem_weekly') | from_json)['comparisonValues'][0])/7) %}
+        {% set diff = current - last %}
+        {% set percent = (diff / last) * 100 %}
+        {{ percent | round(0) }}
 
     - name: Varmtvann daglig snitt siste syv dager
       unit_of_measurement: "L"
-      state: "{{ (((states('sensor.techem_weekly') | from_json)[1]['value'])*1000/7) | round(0) }}"
+      state: "{{ (((states('sensor.techem_weekly') | from_json)['values'][1])*1000/7) | round(0) }}"
+
+    - name: Varmtvann sammenlignet med forrige syv dagers periode
+      unit_of_measurement: "%"
+      state: >
+        {% set current = (((states('sensor.techem_weekly') | from_json)['values'][1])*1000/7) %}
+        {% set last = (((states('sensor.techem_weekly') | from_json)['comparisonValues'][1])*1000/7) %}
+        {% set diff = current - last %}
+        {% set percent = (diff / last) * 100 %}
+        {{ percent | round(0) }}

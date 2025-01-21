@@ -26,22 +26,24 @@ Koden er oversatt og utviklet med utgangspunkt i [@khaffner](https://github.com/
 3. Trykk på 'Network' i menyen
 4. Refresh nettsiden (F5)
 5. Finn en ```graphql``` request i listen
-6. Finn ```tenancyId``` under 'Payload' i requesten
+6. Finn ```objectId``` under 'Payload' i requesten
 
 ### Secrets.yaml
 1. Oppdater mailadressen i ```secrets.yaml```  (techem_email) til [TechemAdmin](https://beboer.techemadmin.no/) mailadressen din
 2. Oppdater passordet i ```secrets.yaml``` (techem_password) til [TechemAdmin](https://beboer.techemadmin.no/) passordet ditt
-3. Oppdater ID i ```secrets.yaml``` (techem_tenancyID) til det 7-sifrede tallet du fant i forrige del
+3. Oppdater ID i ```secrets.yaml``` (techem_objectId) til det 7-sifrede tallet du fant i forrige del
 
 **Til slutt:** Restart HA og verifiser at begge hovedsensorene og de seks utledede templatesensorene finnes i (Innstillinger -> Enheter og tjenester -> Entiteter):
 - ```sensor.techem_yearly```
 - ```sensor.techem_weekly```
-- ```sensor.varmtvann_daglig_snitt_forrige_uke```
-- ```sensor.varmtvann_i_ar```
-- ```sensor.varmtvann_sammenlignet_med_i_fjor```
-- ```sensor.energi_daglig_snitt_forrige_uke```
 - ```sensor.energi_i_ar```
 - ```sensor.energi_sammenlignet_med_i_fjor```
+- ```sensor.varmtvann_i_ar```
+- ```sensor.varmtvann_sammenlignet_med_i_fjor```
+- ```sensor.energi_daglig_snitt_siste_syv_dager```
+- ```sensor.energi_sammenlignet_med_forrige_syv_dagers_periode```
+- ```sensor.varmtvann_daglig_snitt_siste_syv_dager```
+- ```sensor.varmtvann_sammenlignet_med_forrige_syv_dagers_periode```
 
 ## Konfigurasjon
 ### Home Assistant kort
@@ -50,7 +52,7 @@ Eksempel på oppsett av et kort fra bildet over:
 
 ### Python
 Python koden kan konfigureres til å hente data fra ulike perioder. Per nå ligger det to funksjoner inne for å konstruere korrekt datoformat:
-- ```get_time_as_string(n: int)``` returnerer datoen ```n``` dager tilbake i tid.
-- ```get_time_as_string_year()``` returnerer startdato som første dag dette året, og sluttdato som gårsdagen.
+- ```get_date_as_string(n: int)``` returnerer datoen ```n``` dager tilbake i tid.
+- ```get_first_date_as_string()``` returnerer datoen til den første dagen i året.
 
-Koden er nå satt opp til å både hente ut forbruk så langt dette året, og fra for 9 dager siden til for 2 dager siden (for å hindre manglende ny data), og regne om dette til et daglig gjennomsnitt.
+Koden er nå satt opp til å både hente ut forbruk så langt dette året, og fra for 8 dager siden til for 1 dager siden (for å hindre manglende ny data), og regne om dette til et daglig gjennomsnitt.
