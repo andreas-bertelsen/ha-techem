@@ -137,7 +137,7 @@ def get_data(techem_email: str, techem_password: str, object_id: int, yearly: bo
 def main() -> None:
     email = sys.argv[1]
     password = sys.argv[2]
-    id = int(sys.argv[3])
+    id = sys.argv[3]
     yearly = sys.argv[4] == "True"
 
     offset = 1
