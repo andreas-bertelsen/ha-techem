@@ -20,18 +20,18 @@ Koden er oversatt og utviklet med utgangspunkt i [@khaffner](https://github.com/
 1. Opprett ```.yaml``` filer dersom du mangler noen av disse
 2. Kopier og lim inn konfigurasjonene fra ```.yaml``` filene
 
-### TenancyID
+### ObjectID
 1. Logg inn på [TechemAdmin](https://beboer.techemadmin.no/)
 2. Åpne utviklerverktøyet i nettleseren din (F12)
 3. Trykk på 'Network' i menyen
 4. Refresh nettsiden (F5)
 5. Finn en ```graphql``` request i listen
-6. Finn ```objectId``` under 'Payload' i requesten
+6. Finn og lagre ```objectId``` under 'Payload' i requesten
 
 ### Secrets.yaml
 1. Oppdater mailadressen i ```secrets.yaml```  (techem_email) til [TechemAdmin](https://beboer.techemadmin.no/) mailadressen din
 2. Oppdater passordet i ```secrets.yaml``` (techem_password) til [TechemAdmin](https://beboer.techemadmin.no/) passordet ditt
-3. Oppdater ID i ```secrets.yaml``` (techem_objectId) til det 7-sifrede tallet du fant i forrige del
+3. Oppdater ID i ```secrets.yaml``` (techem_objectId) til den ~20 tegn lange koden du fant i forrige del
 
 **Til slutt:** Restart HA og verifiser at begge hovedsensorene og de seks utledede templatesensorene finnes i (Innstillinger -> Enheter og tjenester -> Entiteter):
 - ```sensor.techem_yearly```
